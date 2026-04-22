@@ -1,6 +1,6 @@
 import { nextServer } from './api';
-import { User } from '@/types/user';
-import { Note } from '@/types/note';
+import type { User } from '@/types/user';
+import type { Note } from '@/types/note';
 
 interface AuthRequest {
   email: string;
@@ -18,6 +18,11 @@ interface FetchNotesParams {
   tag?: string;
 }
 
+interface FetchNotesResponse {
+  notes: Note[];
+  totalPages: number;
+}
+
 export const register = async (data: AuthRequest): Promise<User> => {
   const res = await nextServer.post<User>('/auth/register', data);
   return res.data;
@@ -32,8 +37,8 @@ export const logout = async (): Promise<void> => {
   await nextServer.post('/auth/logout');
 };
 
-export const checkSession = async () => {
-  const res = await nextServer.get('/auth/session');
+export const checkSession = async (): Promise<User | null> => {
+  const res = await nextServer.get<User | null>('/auth/session');
   return res.data;
 };
 
@@ -47,8 +52,10 @@ export const updateMe = async (data: UpdateUserRequest): Promise<User> => {
   return res.data;
 };
 
-export const fetchNotes = async (params: FetchNotesParams) => {
-  const res = await nextServer.get('/notes', { params });
+export const fetchNotes = async (
+  params: FetchNotesParams
+): Promise<FetchNotesResponse> => {
+  const res = await nextServer.get<FetchNotesResponse>('/notes', { params });
   return res.data;
 };
 
@@ -61,12 +68,12 @@ export const createNote = async (data: {
   title: string;
   content: string;
   tag: string;
-}) => {
-  const res = await nextServer.post('/notes', data);
+}): Promise<Note> => {
+  const res = await nextServer.post<Note>('/notes', data);
   return res.data;
 };
 
-export const deleteNote = async (id: string) => {
-  const res = await nextServer.delete(`/notes/${id}`);
+export const deleteNote = async (id: string): Promise<Note> => {
+  const res = await nextServer.delete<Note>(`/notes/${id}`);
   return res.data;
 };

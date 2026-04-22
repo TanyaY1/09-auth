@@ -2,11 +2,11 @@
 
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import css from './SignInPage.module.css';
 import { login } from '@/lib/api/clientApi';
 import { useAuthStore } from '@/lib/store/authStore';
+import css from './SignInPage.module.css';
 
-const SignInPage = () => {
+export default function SignInPage() {
   const router = useRouter();
   const { setUser } = useAuthStore();
   const [error, setError] = useState('');
@@ -16,6 +16,7 @@ const SignInPage = () => {
     setError('');
 
     const formData = new FormData(event.currentTarget);
+
     const email = String(formData.get('email'));
     const password = String(formData.get('password'));
 
@@ -24,7 +25,7 @@ const SignInPage = () => {
       setUser(user);
       router.push('/profile');
     } catch {
-      setError('Login failed');
+      setError('Invalid credentials');
     }
   };
 
@@ -53,6 +54,4 @@ const SignInPage = () => {
       </form>
     </main>
   );
-};
-
-export default SignInPage;
+}
