@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-type NoteDraft = {
+export type NoteDraft = {
   title: string;
   content: string;
   tag: string;

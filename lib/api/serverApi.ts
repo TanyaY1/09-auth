@@ -27,20 +27,16 @@ export const getServerMe = async (): Promise<User> => {
   return res.data;
 };
 
-export const checkServerSession = async (): Promise<User | null> => {
+export const checkServerSession = async () => {
   const cookieStore = await cookies();
 
-  try {
-    const res = await nextServer.get<User | null>('/auth/session', {
-      headers: {
-        Cookie: cookieStore.toString(),
-      },
-    });
+  const res = await nextServer.get('/auth/session', {
+    headers: {
+      Cookie: cookieStore.toString(),
+    },
+  });
 
-    return res.data;
-  } catch {
-    return null;
-  }
+  return res;
 };
 
 export const fetchServerNotes = async (

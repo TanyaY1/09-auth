@@ -5,9 +5,12 @@ import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import css from './EditProfilePage.module.css';
 import { getMe, updateMe } from '@/lib/api/clientApi';
+import { useAuthStore } from '@/lib/store/authStore';
 
 const EditProfilePage = () => {
   const router = useRouter();
+  const setUser = useAuthStore((state) => state.setUser);
+
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [avatar, setAvatar] = useState('');
@@ -18,14 +21,18 @@ const EditProfilePage = () => {
       setUsername(user.username);
       setEmail(user.email);
       setAvatar(user.avatar);
+      setUser(user);
     };
 
     fetchUser();
-  }, []);
+  }, [setUser]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    await updateMe({ username });
+
+    const updatedUser = await updateMe({ username });
+    setUser(updatedUser);
+
     router.push('/profile');
   };
 
@@ -42,13 +49,15 @@ const EditProfilePage = () => {
       <div className={css.profileCard}>
         <h1 className={css.formTitle}>Edit Profile</h1>
 
-        <Image
-          src={avatar}
-          alt="User Avatar"
-          width={120}
-          height={120}
-          className={css.avatar}
-        />
+        {avatar && (
+          <Image
+            src={avatar}
+            alt="User Avatar"
+            width={120}
+            height={120}
+            className={css.avatar}
+          />
+        )}
 
         <form className={css.profileInfo} onSubmit={handleSubmit}>
           <div className={css.usernameWrapper}>

@@ -1,10 +1,11 @@
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import css from './ProfilePage.module.css';
 import { getServerMe } from '@/lib/api/serverApi';
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Profile Page',
   description: 'User profile page',
 };

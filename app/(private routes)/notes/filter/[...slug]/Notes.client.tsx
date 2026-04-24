@@ -4,6 +4,9 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchNotes } from '@/lib/api/clientApi';
+import SearchBox from '@/components/SearchBox/SearchBox';
+import NoteList from '@/components/NoteList/NoteList';
+import Pagination from '@/components/Pagination/Pagination';
 import type { Note } from '@/types/note';
 
 type Props = {
@@ -39,72 +42,37 @@ export default function NotesClient({ tag }: Props) {
       }),
   });
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(event.target.value);
+  const handleSearchChange = (value: string): void => {
+    setSearch(value);
     setPage(1);
   };
 
-  const handlePrevPage = () => {
-    setPage((prev) => Math.max(prev - 1, 1));
-  };
-
-  const handleNextPage = () => {
-    if (data && page < data.totalPages) {
-      setPage((prev) => prev + 1);
-    }
+  const handlePageChange = (selectedPage: number): void => {
+    setPage(selectedPage);
   };
 
   return (
     <main>
       <div>
         <Link href="/notes/action/create">Create note +</Link>
-      </div>
-
-      <div>
-        <input
-          type="text"
-          value={search}
-          onChange={handleSearchChange}
-          placeholder="Search notes"
-        />
+        <SearchBox value={search} onChange={handleSearchChange} />
       </div>
 
       {isLoading && <p>Loading notes...</p>}
       {isError && <p>Something went wrong while loading notes.</p>}
 
-      {!isLoading && !isError && data?.notes?.length === 0 && <p>No notes found.</p>}
+      {!isLoading && !isError && data?.notes.length === 0 && (
+        <p>No notes found.</p>
+      )}
 
-      {data?.notes?.length ? (
-        <ul>
-          {data.notes.map((note: Note) => (
-            <li key={note.id}>
-              <h3>{note.title}</h3>
-              <p>{note.content}</p>
-              <p>{note.tag}</p>
-              <Link href={`/notes/${note.id}`}>Open note</Link>
-            </li>
-          ))}
-        </ul>
-      ) : null}
+      {data?.notes.length ? <NoteList notes={data.notes} /> : null}
 
       {data && data.totalPages > 1 && (
-        <div>
-          <button type="button" onClick={handlePrevPage} disabled={page === 1}>
-            Prev
-          </button>
-
-          <span>
-            Page {page} of {data.totalPages}
-          </span>
-
-          <button
-            type="button"
-            onClick={handleNextPage}
-            disabled={page === data.totalPages}
-          >
-            Next
-          </button>
-        </div>
+        <Pagination
+          pageCount={data.totalPages}
+          currentPage={page}
+          onPageChange={handlePageChange}
+        />
       )}
     </main>
   );
