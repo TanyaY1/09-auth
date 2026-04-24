@@ -1,13 +1,18 @@
 import { cookies } from 'next/headers';
 import { nextServer } from './api';
-import { User } from '@/types/user';
-import { Note } from '@/types/note';
+import type { User } from '@/types/user';
+import type { Note } from '@/types/note';
 
 interface FetchNotesParams {
   search?: string;
   page?: number;
   perPage?: number;
   tag?: string;
+}
+
+interface FetchNotesResponse {
+  notes: Note[];
+  totalPages: number;
 }
 
 export const getServerMe = async (): Promise<User> => {
@@ -22,22 +27,28 @@ export const getServerMe = async (): Promise<User> => {
   return res.data;
 };
 
-export const checkServerSession = async () => {
+export const checkServerSession = async (): Promise<User | null> => {
   const cookieStore = await cookies();
 
-  const res = await nextServer.get('/auth/session', {
-    headers: {
-      Cookie: cookieStore.toString(),
-    },
-  });
+  try {
+    const res = await nextServer.get<User | null>('/auth/session', {
+      headers: {
+        Cookie: cookieStore.toString(),
+      },
+    });
 
-  return res.data;
+    return res.data;
+  } catch {
+    return null;
+  }
 };
 
-export const fetchServerNotes = async (params: FetchNotesParams) => {
+export const fetchServerNotes = async (
+  params: FetchNotesParams
+): Promise<FetchNotesResponse> => {
   const cookieStore = await cookies();
 
-  const res = await nextServer.get('/notes', {
+  const res = await nextServer.get<FetchNotesResponse>('/notes', {
     params,
     headers: {
       Cookie: cookieStore.toString(),

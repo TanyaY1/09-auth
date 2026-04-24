@@ -2,13 +2,13 @@
 
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import css from './SignUpPage.module.css';
 import { register } from '@/lib/api/clientApi';
 import { useAuthStore } from '@/lib/store/authStore';
+import css from './SignUpPage.module.css';
 
-const SignUpPage = () => {
+export default function SignUpPage() {
   const router = useRouter();
-  const { setUser } = useAuthStore();
+  const setUser = useAuthStore((state) => state.setUser);
   const [error, setError] = useState('');
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -16,6 +16,7 @@ const SignUpPage = () => {
     setError('');
 
     const formData = new FormData(event.currentTarget);
+
     const email = String(formData.get('email'));
     const password = String(formData.get('password'));
 
@@ -24,7 +25,7 @@ const SignUpPage = () => {
       setUser(user);
       router.push('/profile');
     } catch {
-      setError('Registration failed');
+      setError('Registration failed. This user may already exist.');
     }
   };
 
@@ -35,12 +36,24 @@ const SignUpPage = () => {
       <form className={css.form} onSubmit={handleSubmit}>
         <div className={css.formGroup}>
           <label htmlFor="email">Email</label>
-          <input id="email" type="email" name="email" className={css.input} required />
+          <input
+            id="email"
+            type="email"
+            name="email"
+            className={css.input}
+            required
+          />
         </div>
 
         <div className={css.formGroup}>
           <label htmlFor="password">Password</label>
-          <input id="password" type="password" name="password" className={css.input} required />
+          <input
+            id="password"
+            type="password"
+            name="password"
+            className={css.input}
+            required
+          />
         </div>
 
         <div className={css.actions}>
@@ -53,6 +66,4 @@ const SignUpPage = () => {
       </form>
     </main>
   );
-};
-
-export default SignUpPage;
+}
